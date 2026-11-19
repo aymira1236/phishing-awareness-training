@@ -76,7 +76,7 @@ I designed a five-slide presentation to help HR and Marketing employees understa
 
 **Campaign Results**
 
-![Phishing Campaign Analysis](slide-02-results.png)
+![Phishing Campaign Analysis](slide-02_phishing_result_analysis.png)
 
 **Interactive Email Investigation**
 
@@ -108,7 +108,7 @@ The exercise emphasises that professional language, official-looking signatures,
 
 ### Try the Interactive Training
 
-[Launch Interactive Phishing Investigation](https://YOUR-USERNAME.github.io/phishing-awareness-training/)
+[Launch Interactive Phishing Investigation](https://aymira1236.github.io/phishing-awareness-training/)
 
 ---
 
