@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; form-action 'none'; base-uri 'none'">
+<link rel="icon" href="data:,">
+<title>Investigate the email · Slide 4 practice</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --navy: #101329;
+    --mail: #151932;
+    --chrome: #1c2041;
+    --indigo: #252354;
+    --border: #484781;
+    --purple: #a398ff;
+    --accent: #7c6cff;
+    --cyan: #58c6f5;
+    --alert: #ff5265;
+    --white: #fff;
+    --muted: #b9c8e7;
+    font: 16px/1.5 Arial, sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: radial-gradient(ellipse at 75% 0%, #1e1c45 0%, var(--navy) 46rem);
+    color: var(--white);
+  }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  button:focus-visible {
+    outline: 2px solid var(--cyan);
+    outline-offset: 4px;
+  }
+  button:disabled { opacity: .53; cursor: default; }
+  h1, h2, h3, p, dl, dd { margin: 0; }
+  .screen-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    clip-path: inset(50%);
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  [hidden] { display: none !important; }
+  .page {
+    width: min(100%, 1420px);
+    margin: 0 auto;
+    padding: 36px clamp(20px, 4.3vw, 64px) 25px;
+  }
+  .kicker {
+    color: var(--cyan);
+    font-size: .74rem;
+    font-weight: 700;
+    letter-spacing: .11em;
+    text-transform: uppercase;
+  }
+  h1 {
+    margin-top: 5px;
+    color: var(--purple);
+    font-size: clamp(2.25rem, 4.6vw, 4rem);
+    line-height: 1.07;
+    letter-spacing: -.045em;
+  }
+  .prompt {
+    margin-top: 10px;
+    font-size: clamp(1.15rem, 2.2vw, 1.48rem);
+  }
+  .cases {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 26px;
+    row-gap: 5px;
+    margin: 23px 0 21px;
+    border-bottom: 1px solid var(--border);
+  }
+  .case {
+    min-height: 44px;
+    padding: 6px 2px;
+    background: none;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    color: var(--muted);
+    font-weight: 700;
+    text-align: left;
+  }
+  .case:hover { color: var(--white); }
+  .case[aria-pressed="true"] {
+    color: var(--white);
+    border-bottom-color: var(--cyan);
+  }
+  .desk {
+    display: grid;
+    grid-template-columns: minmax(0, 1.61fr) minmax(310px, 1fr);
+    gap: 20px;
+    align-items: start;
+  }
+  .email, .notes {
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    background: var(--mail);
+    min-width: 0;
+  }
+  .email { overflow: hidden; }
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 18px;
+    padding: 13px 20px;
+    background: var(--chrome);
+    border-bottom: 1px solid var(--border);
+  }
+  .toolbar .source {
+    color: var(--muted);
+    font-size: .79rem;
+  }
+  .message { padding: 18px 22px 25px; }
+  .fields {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: 6px 15px;
+    margin-bottom: 17px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: .975rem;
+  }
+  .fields dt { color: var(--muted); font-weight: 700; }
+  .fields dd { overflow-wrap: anywhere; }
+  .subject { font-weight: 700; }
+  .body {
+    display: grid;
+    gap: 13px;
+    font-size: 1.025rem;
+    line-height: 1.54;
+  }
+  .hotspot {
+    position: relative;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 3px;
+    text-align: left;
+    line-height: inherit;
+    max-width: 100%;
+  }
+  .hotspot:hover, .hotspot:focus-visible {
+    background: #233151;
+    box-shadow: 0 0 0 3px #233151;
+  }
+  .hotspot.is-found {
+    outline: 1px solid var(--alert);
+    outline-offset: 2px;
+    background: #36223c;
+  }
+  .hotspot.is-found:focus-visible {
+    outline: 2px solid var(--cyan);
+  }
+  .hotspot.is-found::after {
+    content: attr(data-number);
+    display: inline-grid;
+    place-items: center;
+    margin-left: 6px;
+    width: 1.22em;
+    height: 1.22em;
+    border-radius: 50%;
+    color: var(--navy);
+    background: var(--alert);
+    font-size: .73em;
+    font-weight: 700;
+    vertical-align: .12em;
+  }
+  .hotspot.mock-cta {
+    padding: 7px 12px;
+    background: var(--indigo);
+    border: 1px solid var(--cyan);
+    border-radius: 7px;
+    color: var(--cyan);
+    font-weight: 700;
+  }
+  .hotspot.mock-cta:hover, .hotspot.fake-link:hover { color: var(--white); }
+  .fake-link { color: var(--cyan); text-decoration: underline; }
+  .fine-print {
+    font-size: .9rem;
+    color: var(--muted);
+    line-height: 1.48;
+  }
+  .notes {
+    padding: 18px 19px 20px;
+    background: #1a1d3d;
+  }
+  .notes-title {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: baseline;
+  }
+  .notes-title h2 { font-size: 1.075rem; }
+  #progress {
+    flex: 0 0 auto;
+    color: var(--cyan);
+    font-size: .83rem;
+    font-weight: 700;
+  }
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    margin: 10px 0 15px;
+  }
+  .steps span { height: 3px; background: #4b4a77; border-radius: 2px; }
+  .steps .tested { background: var(--cyan); }
+  .instructions { color: var(--muted); font-size: .93rem; }
+  .controls { display: flex; flex-wrap: wrap; gap: 7px; margin: 14px 0 0; }
+  .control {
+    min-height: 43px;
+    border-radius: 7px;
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    background: transparent;
+    font-weight: 700;
+    font-size: .91rem;
+  }
+  .control:not(:disabled):hover { background: var(--indigo); }
+  .control.primary {
+    border-color: #9083ff;
+    background: var(--accent);
+    color: var(--navy);
+  }
+  .control.primary:not(:disabled):hover { background: #a398ff; }
+  .findings {
+    list-style: none;
+    padding: 0;
+    margin: 13px 0 0;
+    display: grid;
+    gap: 7px;
+  }
+  .finding {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr);
+    gap: 8px;
+    padding: 9px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--indigo);
+  }
+  .number {
+    display: grid;
+    place-items: center;
+    align-self: start;
+    width: 23px;
+    height: 23px;
+    border: 1px solid var(--alert);
+    border-radius: 50%;
+    color: #ff8592;
+    font-weight: 700;
+    font-size: .8rem;
+  }
+  .finding h3 { font-size: .955rem; line-height: 1.4; }
+  .finding p {
+    margin-top: 2px;
+    color: var(--muted);
+    font-size: .9rem;
+    line-height: 1.4;
+  }
+  .decision {
+    border-top: 1px solid var(--border);
+    margin-top: 14px;
+    padding-top: 13px;
+  }
+  .decision h3 { font-size: 1rem; }
+  .choices { display: grid; gap: 5px; margin-top: 7px; }
+  .choice {
+    padding: 6px 9px;
+    min-height: 34px;
+    color: var(--white);
+    background: var(--mail);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    text-align: left;
+    font-size: .88rem;
+  }
+  .choice:hover { background: var(--indigo); }
+  .choice[aria-pressed="true"] { border-color: var(--cyan); }
+  .feedback {
+    margin-top: 9px;
+    color: var(--muted);
+    font-size: .92rem;
+    line-height: 1.45;
+  }
+  .feedback[data-kind="correct"] {
+    padding-left: 9px;
+    border-left: 2px solid var(--cyan);
+  }
+  .feedback[data-kind="retry"] {
+    padding-left: 9px;
+    border-left: 2px solid var(--alert);
+  }
+  .footer {
+    color: var(--muted);
+    margin-top: 17px;
+    font-size: .85rem;
+  }
+  @media (max-width: 850px) {
+    .page { padding-top: 25px; }
+    .desk { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 490px) {
+    .message { padding: 15px 16px 19px; }
+    .toolbar { padding: 11px 15px; }
+    .fields { gap: 7px 10px; }
+    .case { font-size: .92rem; }
+    .cases { column-gap: 19px; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .case, .control, .choice { transition: background-color .15s, border-color .15s; }
+  }
+</style>
+</head>
+<body>
+<main class="page">
+  <header>
+    <p class="kicker">Forage educational simulation · Slide 4 practice</p>
+    <h1>Investigate the email</h1>
+    <p class="prompt">What would you verify before trusting this email?</p>
+  </header>
+
+  <div class="cases" role="group" aria-label="Practice cases">
+    <button class="case" type="button" data-case="security" aria-pressed="true" aria-controls="email-message">Account security</button>
+    <button class="case" type="button" data-case="reward" aria-pressed="false" aria-controls="email-message">Black Friday reward</button>
+  </div>
+
+  <div class="desk">
+    <section class="email" aria-label="Simulated email">
+      <div class="toolbar">
+        <p class="kicker">Simulated email</p>
+        <p class="source" id="source">Original training email · Links inactive</p>
+      </div>
+      <div class="message" id="email-message"></div>
+    </section>
+
+    <aside class="notes" aria-labelledby="notes-title">
+      <div class="notes-title">
+        <h2 id="notes-title">Investigation notes</h2>
+        <p id="progress">0 of 4 checked</p>
+      </div>
+      <div class="steps" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+      <p class="instructions" id="instructions">Select text in the email to investigate, or reveal the clues in order.</p>
+      <div class="controls">
+        <button class="control primary" id="next" type="button">Reveal next clue</button>
+        <button class="control" id="reset" type="button" disabled>Reset case</button>
+      </div>
+      <ol class="findings" id="findings" aria-label="Revealed observations"></ol>
+
+      <section class="decision" id="decision" aria-labelledby="decision-title" hidden>
+        <h3 id="decision-title">What would you do next?</h3>
+        <div class="choices" role="group" aria-label="Choose your next action">
+          <button class="choice" type="button" data-answer="link" aria-pressed="false">Open the link to check the request</button>
+          <button class="choice" type="button" data-answer="reply" aria-pressed="false">Reply to the sender for confirmation</button>
+          <button class="choice" type="button" data-answer="verify" aria-pressed="false">Verify through a known channel</button>
+        </div>
+        <p class="feedback" id="feedback" role="status" hidden></p>
+      </section>
+      <p class="screen-only" id="announcement" role="status"></p>
+    </aside>
+  </div>
+
+  <footer class="footer">Security starts with a second look.</footer>
+  <noscript><p>This offline practice requires JavaScript to reveal the clues.</p></noscript>
+</main>
+
+<template id="security-email">
+  <dl class="fields">
+    <dt>From</dt><dd><button class="hotspot" type="button" data-clue="sender" aria-describedby="instructions">it-security@mastercard.example</button></dd>
+    <dt>To</dt><dd>employee@email.com</dd>
+    <dt>Subject</dt><dd class="subject">Action Required: Review Your Account Security</dd>
+  </dl>
+  <div class="body">
+    <p>Hello [Employee Name],</p>
+    <p>As part of our routine security review, <button class="hotspot" type="button" data-clue="claim" aria-describedby="instructions">we have identified an issue</button> that may affect your access to Mastercard corporate email and internal collaboration tools.</p>
+    <p>To avoid potential disruption to your daily work, please review the account security notice by <button class="hotspot" type="button" data-clue="deadline" aria-describedby="instructions">5:00 PM today</button>.</p>
+    <p><button class="hotspot mock-cta" type="button" data-clue="destination" aria-label="Inspect the mock Review Your Account Security button">Review Your Account Security</button></p>
+    <p>If you have any questions, please contact the IT Help Desk through your usual internal support channel.</p>
+    <p>Kind regards,<br>IT Security Team<br>Mastercard</p>
+  </div>
+</template>
+
+<template id="reward-email">
+  <dl class="fields">
+    <dt>From</dt><dd><button class="hotspot" type="button" data-clue="sender" aria-describedby="instructions">Mastercard Staff Rewards</button></dd>
+    <dt>To</dt><dd>employee@email.com</dd>
+    <dt>Subject</dt><dd class="subject">Your Black Friday Employee reward card</dd>
+  </dl>
+  <div class="body">
+    <p>Hello &lt;name&gt;,</p>
+    <p>In recognition of your hard work throughout the year, <button class="hotspot" type="button" data-clue="offer" aria-describedby="instructions">we wish to reward you with a gift card</button> to use in the upcoming Black Friday sales event.</p>
+    <p>The balance of your gift card will be determined based on your role. To view the balance and activate your employee reward card, visit <button class="hotspot fake-link" type="button" data-clue="destination" aria-label="Inspect the mock link labelled here">here</button>.</p>
+    <p>For any questions or queries, please contact Staff Rewards support.</p>
+    <p>From,<br>Staff Reward Services</p>
+    <p><button class="hotspot fine-print" type="button" data-clue="polish" aria-describedby="instructions">CONFIDENTIAL. This communication is intended for the use of the named recipient only.</button></p>
+  </div>
+</template>
+
+<script>
+  const cases = {
+    security: {
+      source: 'Original training email · Links inactive',
+      knownChannel: 'IT support',
+      verified: 'Verify the request through an IT support channel you already know. If it looks suspicious, use your approved security reporting process.',
+      clues: [
+        ['deadline', 'Time pressure', 'The 5:00 PM deadline can push you to skip your normal checks. Pause and verify the request.'],
+        ['claim', 'Vague security claim', 'The email describes a possible loss of access and leaves the issue unexplained. Confirm the claim through known IT support.'],
+        ['destination', 'Hidden link destination', 'The button label gives no destination. In a real email, inspect the URL without opening it. This example supplies no URL.'],
+        ['sender', 'Sender verification', 'Inspect the full sender address. Even a familiar-looking address needs an independent check through a known channel.']
+      ]
+    },
+    reward: {
+      source: 'Adapted from the Forage example · Links inactive',
+      knownChannel: 'HR',
+      verified: 'Check the offer through a known HR channel, such as the staff directory. If the message looks suspicious, use your approved security reporting process.',
+      clues: [
+        ['offer', 'Unexpected reward', 'A gift card tied to Black Friday feels timely and relevant. Confirm that the offer exists before taking any action.'],
+        ['destination', 'Hidden link destination', '“Here” gives no destination. Inspect the actual URL without opening it in a real message. The example does not provide that URL.'],
+        ['sender', 'Sender verification', '“Mastercard Staff Rewards” is the displayed name. The example does not show the actual sender address. Check the full address and confirm through a known HR channel.'],
+        ['polish', 'Professional appearance', 'Personalisation and formal wording can make an offer feel familiar. A confidentiality notice can be copied. Verify the sender and the offer independently.']
+      ]
+    }
+  };
+
+  const state = {
+    security: { revealed: new Set(), answer: null },
+    reward: { revealed: new Set(), answer: null }
+  };
+  let current = 'security';
+
+  const message = document.querySelector('#email-message');
+  const source = document.querySelector('#source');
+  const findings = document.querySelector('#findings');
+  const progress = document.querySelector('#progress');
+  const announcement = document.querySelector('#announcement');
+  const next = document.querySelector('#next');
+  const reset = document.querySelector('#reset');
+  const decision = document.querySelector('#decision');
+  const feedback = document.querySelector('#feedback');
+  const caseButtons = [...document.querySelectorAll('[data-case]')];
+  const answerButtons = [...document.querySelectorAll('[data-answer]')];
+  const stepMarkers = [...document.querySelectorAll('.steps span')];
+
+  function drawFinding(index, title, explanation) {
+    const row = document.createElement('li');
+    row.className = 'finding';
+    const marker = document.createElement('span');
+    marker.className = 'number';
+    marker.textContent = String(index + 1);
+    marker.setAttribute('aria-hidden', 'true');
+    const detail = document.createElement('div');
+    const heading = document.createElement('h3');
+    heading.textContent = title;
+    const description = document.createElement('p');
+    description.textContent = explanation;
+    detail.append(heading, description);
+    row.append(marker, detail);
+    return row;
+  }
+
+  function updateFeedback() {
+    const answer = state[current].answer;
+    const trainingCase = cases[current];
+    for (const button of answerButtons) {
+      button.setAttribute('aria-pressed', String(button.dataset.answer === answer));
+    }
+    if (answer === null) {
+      feedback.hidden = true;
+      feedback.textContent = '';
+      return;
+    }
+    feedback.hidden = false;
+    feedback.dataset.kind = answer === 'verify' ? 'correct' : 'retry';
+    const messages = {
+      link: `Leave the link unopened. Start a separate check through a known ${trainingCase.knownChannel} channel.`,
+      reply: `A reply goes back to the person who sent the message. Look up and use a known ${trainingCase.knownChannel} channel instead.`,
+      verify: trainingCase.verified
+    };
+    feedback.textContent = messages[answer];
+  }
+
+  function updateFindings() {
+    const { clues } = cases[current];
+    const { revealed } = state[current];
+    const entries = [];
+    clues.forEach(([id, title, detail], index) => {
+      const button = message.querySelector(`[data-clue="${id}"]`);
+      const found = revealed.has(id);
+      button.dataset.number = String(index + 1);
+      button.classList.toggle('is-found', found);
+      button.setAttribute('aria-pressed', String(found));
+      if (found) entries.push(drawFinding(index, title, detail));
+    });
+    findings.replaceChildren(...entries);
+    progress.textContent = `${revealed.size} of ${clues.length} checked`;
+    stepMarkers.forEach((marker, index) => marker.classList.toggle('tested', index < revealed.size));
+    next.disabled = revealed.size === clues.length;
+    reset.disabled = revealed.size === 0;
+    decision.hidden = revealed.size !== clues.length;
+    updateFeedback();
+  }
+
+  function renderCase() {
+    source.textContent = cases[current].source;
+    const template = document.querySelector(`#${current}-email`);
+    message.replaceChildren(template.content.cloneNode(true));
+    caseButtons.forEach(button => {
+      button.setAttribute('aria-pressed', String(button.dataset.case === current));
+    });
+    updateFindings();
+  }
+
+  function reveal(id) {
+    const entry = cases[current].clues.find(clue => clue[0] === id);
+    if (!entry || state[current].revealed.has(id)) return;
+    state[current].revealed.add(id);
+    updateFindings();
+    announcement.textContent = `${entry[1]}. ${entry[2]} ${progress.textContent}.`;
+  }
+
+  for (const button of caseButtons) {
+    button.addEventListener('click', () => {
+      if (current === button.dataset.case) return;
+      current = button.dataset.case;
+      announcement.textContent = `${button.textContent} case loaded.`;
+      renderCase();
+    });
+  }
+
+  message.addEventListener('click', event => {
+    const button = event.target.closest('[data-clue]');
+    if (button) reveal(button.dataset.clue);
+  });
+
+  next.addEventListener('click', () => {
+    const nextClue = cases[current].clues.find(([id]) => !state[current].revealed.has(id));
+    if (nextClue) reveal(nextClue[0]);
+    if (next.disabled) answerButtons[0].focus({ preventScroll: true });
+  });
+
+  reset.addEventListener('click', () => {
+    state[current] = { revealed: new Set(), answer: null };
+    updateFindings();
+    announcement.textContent = 'Case reset. All clues are hidden.';
+    next.focus();
+  });
+
+  for (const button of answerButtons) {
+    button.addEventListener('click', () => {
+      state[current].answer = button.dataset.answer;
+      updateFeedback();
+    });
+  }
+
+  renderCase();
+</script>
+</body>
+</html>
